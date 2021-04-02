@@ -8,6 +8,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: echo "start building"
+    - run: git submodule update --init
+    - run: pod install --verbose
       
     - name: iOS Build Action
       uses: yukiarrr/ios-build-action@v1.3.3
@@ -17,3 +19,5 @@ jobs:
         p12-base64: ${{ secrets.P12_BASE64 }}
         mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
         workspace-path: Potatso.xcworkspace
+        code-signing-identity: "iOS Distribution"
+        team-id: M9YU58J97L
