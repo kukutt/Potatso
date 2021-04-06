@@ -8,12 +8,6 @@ jobs:
     runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
-      #- uses: actions/setup-java@v1
-      #  with:
-      #    java-version: '12.x'
-      #- uses: subosito/flutter-action@v1
-      #  with:
-      #    channel: stable
       - name: Gen certificates and profiles
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
@@ -38,8 +32,7 @@ jobs:
       - run: xcode-project build-ipa --workspace hello/hello/hello.xcodeproj/project.xcworkspace --scheme hello --config Release
       - run: find . -name *.ipa
       - run: find . -name *.app
-      #- uses: actions/upload-artifact@v2
-      #  with:
-      #    name: ios
-      #    path: "./build/ios/ipa/demo.ipa"
-      
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ios
+          path: "./build/ios/ipa/hello.ipa"
