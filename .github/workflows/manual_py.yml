@@ -36,6 +36,8 @@ jobs:
           keychain add-certificates --certificate ~/Library/MobileDevice/Certificates/certificate.p12 --certificate-password ${{ secrets.CERT_PASSWORD }}
       - run: xcode-project use-profiles
       - run: xcode-project build-ipa --workspace hello/hello/hello.xcodeproj/project.xcworkspace --scheme hello --config Release
+      - run: find . -name *.ipa
+      - run: find . -name *.app
       #- uses: actions/upload-artifact@v2
       #  with:
       #    name: ios
