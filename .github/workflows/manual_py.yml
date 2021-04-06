@@ -1,0 +1,43 @@
+name: Gen_IPA_py
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ios-build:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: stable
+      - name: Gen certificates and profiles
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          mkdir -p ~/Library/MobileDevice/Certificates/
+          echo ${{ secrets.P12_BASE64 }} | base64 -D > ~/Library/MobileDevice/Certificates/certificate.p12
+          echo ${{ secrets.MOBILEPROVISION_BASE64 }} | base64 -D > ~/Library/MobileDevice/Provisioning\ Profiles/decoded.mobileprovision
+          echo ${{ secrets.CERT_PASSWORD }} > ~/Library/MobileDevice/Provisioning\ Profiles/password
+          md5 ~/Library/MobileDevice/Certificates/certificate.p12
+          md5 ~/Library/MobileDevice/Provisioning\ Profiles/decoded.mobileprovision
+          md5 ~/Library/MobileDevice/Provisioning\ Profiles/password
+      - name: Install python and codemagic tools
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install python dependencies
+        run:  python -m pip install codemagic-cli-tools
+      - name: Initialize Keychain with certificate
+        run: |
+          keychain initialize
+          keychain add-certificates --certificate ~/Library/MobileDevice/Certificates/certificate.p12 --certificate-password ${{ secrets.CERT_PASSWORD }}
+      - run: xcode-project use-profiles
+      - run: xcode-project build-ipa --workspace hello/hello/hello.xcodeproj/project.xcworkspace --scheme hello --config Release
+      #- uses: actions/upload-artifact@v2
+      #  with:
+      #    name: ios
+      #    path: "./build/ios/ipa/demo.ipa"
+      
